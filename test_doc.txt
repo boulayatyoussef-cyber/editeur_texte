@@ -1,0 +1,5 @@
+This is the test document for the editor.
+I need to bye an appple and a banan.
+This line will be edited.
+A line about text editor.
+EOF

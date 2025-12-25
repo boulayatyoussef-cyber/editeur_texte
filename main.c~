@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include "editor.h"
+
+#define MAX_DICT_WORDS 10000
+
+int main(int argc, char *argv[]) {
+    if (argc < 3) {
+        printf("Usage: %s <filename> <dictionary_file>\n", argv[0]);
+        return 1;
+    }
+
+    char *filename = argv[1];
+    char *dict_file = argv[2];
+
+    TextFile tf;
+    load_file(&tf, filename);
+
+    char *dictionary[MAX_DICT_WORDS];
+    int dict_size = load_dictionary(dict_file, dictionary, MAX_DICT_WORDS);
+    if (dict_size == 0) {
+        printf("Dictionary is empty or could not be loaded.\n");
+    }
+
+    int choice;
+    do {
+        printf("\n--- Simple Text Editor ---\n");
+        printf("1. View file\n");
+        printf("2. Edit line\n");
+        printf("3. Save file\n");
+        printf("4. Search in file\n");
+        printf("5. Spell check\n");
+        printf("6. Autocomplete\n");
+        printf("7. Simulate CRDT Operation (C)\n"); // Nouvelle option
+        printf("0. Exit\n");
+        printf("Choice: ");
+        
+        if (scanf("%d", &choice) != 1) {
+            printf("Invalid input. Please enter a number.\n");
+            while(getchar() != '\n');
+            choice = -1; 
+            continue;
+        }
+        getchar(); 
+
+        switch (choice) {
+            // ... (Cas 1 à 6 - Code existant)
+            
+            case 7: {
+                // Simuler la réception d'une opération externe (Insertion)
+                CRDTC_Operation sim_op_insert = {
+                    .line_index = 0,    // Ligne 1 (index 0)
+                    .char_index = 5,    // Position 5
+                    .content = strdup("[CRDT]"),
+                    .timestamp = (long long)time(NULL), 
+                    .site_id = 42,
+                    .type = INSERT
+                };
+                
+                printf("\nSimulating operation from Site 42: INSERT '[CRDT]' at Line 1, Pos 6...\n");
+                apply_crdt_operation(&tf, &sim_op_insert);
+                free(sim_op_insert.content); 
+                
+                // Simuler une autre opération (Suppression)
+                CRDTC_Operation sim_op_del = {
+                    .line_index = 0,
+                    .char_index = 0,
+                    .content = NULL, // Non utilisé pour DELETE
+                    .timestamp = (long long)time(NULL) + 1,
+                    .site_id = 43,
+                    .type = DELETE
+                };
+                printf("Simulating operation from Site 43: DELETE at Line 1, Pos 1...\n");
+                apply_crdt_operation(&tf, &sim_op_del);
+                
+                print_file(&tf); 
+                break;
+            }
+            case 0:
+                printf("Exiting editor. Goodbye!\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 0);
+
+    free_file(&tf);
+    for (int i = 0; i < dict_size; i++) free(dictionary[i]);
+    return 0;
+}

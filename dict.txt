@@ -1,0 +1,9 @@
+apple
+banana
+orange
+edit
+editor
+text
+code
+compiler
+EOF

@@ -1,0 +1,20 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -g
+OBJ = main.o editor.o
+TARGET = editor
+
+all: $(TARGET)
+
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ)
+
+main.o: main.c editor.h
+	$(CC) $(CFLAGS) -c main.c
+
+editor.o: editor.c editor.h
+	$(CC) $(CFLAGS) -c editor.c
+
+clean:
+	rm -f $(OBJ) $(TARGET)
+
+.PHONY: all clean

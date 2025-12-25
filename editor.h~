@@ -1,0 +1,54 @@
+#ifndef EDITOR_H
+#define EDITOR_H
+
+#include <stddef.h>
+#include <time.h> // Pour time_t/long long
+
+#define MAX_LINES 1000
+#define MAX_LINE_LENGTH 256
+#define MAX_DICT_WORDS 10000
+#define MAX_SUGGESTIONS 5
+
+typedef struct {
+    char *lines[MAX_LINES];
+    int line_count;
+} TextFile;
+
+// --- CRDT Simulation Structures (CORRIGÉ) ---
+
+// Déclaration de l'énumération pour rendre INSERT/DELETE visibles
+typedef enum { 
+    INSERT, 
+    DELETE 
+} CRDTC_OperationType;
+
+// Structure représentant une opération de modification
+typedef struct {
+    int line_index;       // Où l'opération a lieu (ligne dans TextFile)
+    int char_index;       // Position exacte dans la ligne
+    char *content;        // Contenu inséré ou à supprimer (peut être NULL pour la suppression)
+    long long timestamp;  // Horodatage unique pour l'ordre
+    int site_id;          // ID de l'utilisateur/nœud qui a créé l'opération
+    CRDTC_OperationType type; // Utilisation du type d'énumération défini
+} CRDTC_Operation;
+
+
+// Fonctions basiques
+void load_file(TextFile *tf, const char *filename);
+void save_file(TextFile *tf, const char *filename);
+void print_file(TextFile *tf);
+void edit_line(TextFile *tf);
+void free_file(TextFile *tf);
+
+// Fonctions avancées
+void search_text(TextFile *tf, const char *word);
+void spell_check(TextFile *tf, char **dictionary, int dict_size);
+void autocomplete(const char *prefix, char **dictionary, int dict_size);
+
+// Fonctions dictionnaire
+int load_dictionary(const char *filename, char **dictionary, int max_words);
+
+// Fonction CRDT
+void apply_crdt_operation(TextFile *tf, CRDTC_Operation *op);
+
+#endif // EDITOR_H
